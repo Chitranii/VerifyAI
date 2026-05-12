@@ -1,0 +1,248 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>VerifyAI — Admin</title>
+    <link rel="stylesheet" href="/static/style.css">
+</head>
+<body>
+
+    <div class="navbar">
+        <div class="logo">VerifyAI <span class="admin-badge">Admin</span></div>
+
+        <div class="nav-links">
+            <a href="/" class="nav-link">Main App</a>
+            <a href="/admin/logout" class="nav-link nav-link-danger">
+                Logout
+            </a>
+        </div>
+    </div>
+
+    <div class="container admin-container">
+
+        <h1 class="admin-title">
+            Admin Audit Log
+        </h1>
+
+        <p class="subtitle">
+            Complete record of all verification activity
+        </p>
+
+        <!-- Stats -->
+        <div class="metrics-grid">
+
+            <div class="metric-card">
+                <div class="metric-label">Total verifications</div>
+                <div class="metric-value">{{ total }}</div>
+            </div>
+
+            <div class="metric-card">
+                <div class="metric-label">Authentic</div>
+                <div class="metric-value metric-authentic">
+                    {{ authentic }}
+                </div>
+            </div>
+
+            <div class="metric-card">
+                <div class="metric-label">Suspicious</div>
+                <div class="metric-value metric-suspicious">
+                    {{ suspicious }}
+                </div>
+            </div>
+
+            <div class="metric-card">
+                <div class="metric-label">Rejected</div>
+                <div class="metric-value metric-rejected">
+                    {{ rejected }}
+                </div>
+            </div>
+
+            <div class="metric-card">
+                <div class="metric-label">Total revenue</div>
+                <div class="metric-value">
+                    ₹{{ revenue }}
+                </div>
+            </div>
+
+        </div>
+
+        <!-- Credit Reset -->
+        <div class="card admin-reset-card">
+
+            <div class="card-title">
+                Reset User Credits
+            </div>
+
+            <p class="admin-reset-desc">
+                Manually set the credit balance for the account.
+                Use this after a user purchases a plan.
+            </p>
+
+            <form method="POST"
+                  action="/admin/reset-credits"
+                  class="admin-reset-form">
+
+                <label for="creditAmount"
+                       class="admin-reset-label">
+
+                    Credit Amount
+
+                </label>
+
+                <input
+                    type="number"
+                    id="creditAmount"
+                    name="amount"
+                    min="0"
+                    max="10000"
+                    class="admin-reset-input"
+                    title="Credit Amount"
+                    placeholder="Enter credits"
+                >
+
+                <button type="submit"
+                        class="verify-btn admin-reset-btn">
+
+                    Set Credits
+
+                </button>
+
+                <span class="admin-reset-note">
+                    Total verifications done:
+                    <strong>{{ total }}</strong>
+                </span>
+
+            </form>
+
+        </div>
+
+        <!-- Audit Table -->
+        <div class="card">
+
+            <div class="card-header">
+
+                <div class="card-title">
+                    All Verifications
+                </div>
+
+                <input
+                    type="text"
+                    id="searchInput"
+                    placeholder="Search by filename or result..."
+                    class="search-input"
+                >
+
+            </div>
+
+            {% if verifications %}
+
+            <table class="data-table" id="auditTable">
+
+                <thead>
+
+                    <tr>
+                        <th>#</th>
+                        <th>Timestamp</th>
+                        <th>Filename</th>
+                        <th>Doc Type</th>
+                        <th>Result</th>
+                        <th>Confidence</th>
+                        <th>Charge</th>
+                    </tr>
+
+                </thead>
+
+                <tbody>
+
+                    {% for v in verifications %}
+
+                    <tr>
+
+                        <td class="muted">
+                            {{ v[0] }}
+                        </td>
+
+                        <td class="muted">
+                            {{ v[7] }}
+                        </td>
+
+                        <td>
+                            {{ v[1] }}
+                        </td>
+
+                        <td>
+                            {{ v[2] }}
+                        </td>
+
+                        <td>
+
+                            <span class="badge badge-{{ v[3]|lower }}">
+
+                                {{ v[3] }}
+
+                            </span>
+
+                        </td>
+
+                        <td>
+                            {{ v[4] }}%
+                        </td>
+
+                        <td>
+                            ₹{{ "%.0f"|format(v[6]) }}
+                        </td>
+
+                    </tr>
+
+                    {% endfor %}
+
+                </tbody>
+
+            </table>
+
+            {% else %}
+
+            <div class="empty-state">
+                No verifications in the system yet.
+            </div>
+
+            {% endif %}
+
+        </div>
+
+    </div>
+
+    <script>
+
+        const searchInput =
+            document.getElementById('searchInput');
+
+        if (searchInput) {
+
+            searchInput.addEventListener('input', function() {
+
+                const query =
+                    this.value.toLowerCase();
+
+                const rows =
+                    document.querySelectorAll(
+                        '#auditTable tbody tr'
+                    );
+
+                rows.forEach(row => {
+
+                    row.style.display =
+                        row.textContent
+                           .toLowerCase()
+                           .includes(query)
+                        ? ''
+                        : 'none';
+                });
+            });
+        }
+
+    </script>
+
+</body>
+</html>

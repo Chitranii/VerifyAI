@@ -1,0 +1,302 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>VerifyAI — Billing</title>
+    <link rel="stylesheet" href="/static/style.css">
+</head>
+<body>
+
+    <div class="navbar">
+
+        <div class="logo">
+            VerifyAI
+        </div>
+
+        <div class="nav-links">
+
+            <a href="/" class="nav-link">
+                Upload
+            </a>
+
+            <a href="/billing" class="nav-link active">
+                Billing
+            </a>
+
+            <a href="/admin" class="nav-link">
+                Admin
+            </a>
+
+            <div class="credits">
+                Credits: <strong>{{ credits }}</strong>
+            </div>
+
+        </div>
+
+    </div>
+
+    <div class="container billing-container">
+
+        <h1 class="billing-title">
+            Billing & Usage
+        </h1>
+
+        <p class="subtitle">
+            Track your verification credits and charges
+        </p>
+
+        <!-- Summary Cards -->
+        <div class="metrics-grid">
+
+            <div class="metric-card">
+
+                <div class="metric-label">
+                    Credits remaining
+                </div>
+
+                <div class="metric-value">
+                    {{ credits }}
+                </div>
+
+                <div class="metric-sub">
+                    ≈ ₹{{ credits * 40 }} value
+                </div>
+
+            </div>
+
+            <div class="metric-card">
+
+                <div class="metric-label">
+                    Total verifications
+                </div>
+
+                <div class="metric-value">
+                    {{ verifications|length }}
+                </div>
+
+                <div class="metric-sub">
+                    All time
+                </div>
+
+            </div>
+
+            <div class="metric-card">
+
+                <div class="metric-label">
+                    Total spent
+                </div>
+
+                <div class="metric-value">
+                    ₹{{ total_spent }}
+                </div>
+
+                <div class="metric-sub">
+                    This account
+                </div>
+
+            </div>
+
+            <div class="metric-card">
+
+                <div class="metric-label">
+                    Cost per verify
+                </div>
+
+                <div class="metric-value">
+                    ₹40
+                </div>
+
+                <div class="metric-sub">
+                    Standard rate
+                </div>
+
+            </div>
+
+        </div>
+
+        <!-- Pricing -->
+        <div class="card billing-plans-card">
+
+            <div class="card-title">
+                Buy Credits
+            </div>
+
+            <div class="plans-grid">
+
+                <!-- PayG -->
+                <div class="plan-card">
+
+                    <div class="plan-name">
+                        Pay as you go
+                    </div>
+
+                    <div class="plan-price">
+                        ₹40
+                    </div>
+
+                    <div class="plan-unit">
+                        per verification
+                    </div>
+
+                    <div class="plan-features">
+                        Demo purchase flow<br>
+                        All document types<br>
+                        Email support
+                    </div>
+
+                    <a href="/payment?plan=payg"
+                       class="plan-btn">
+
+                        Buy 10 credits — ₹400
+
+                    </a>
+
+                </div>
+
+                <!-- Bundle -->
+                <div class="plan-card featured">
+
+                    <div class="plan-badge">
+                        Most popular
+                    </div>
+
+                    <div class="plan-name">
+                        Credit bundle
+                    </div>
+
+                    <div class="plan-price">
+                        ₹40
+                    </div>
+
+                    <div class="plan-unit">
+                        per verification
+                    </div>
+
+                    <div class="plan-features">
+                        100 verifications<br>
+                        All document types<br>
+                        Priority support
+                    </div>
+
+                    <a href="/payment?plan=bundle"
+                       class="plan-btn featured-btn">
+
+                        Buy 100 credits — ₹4,000
+
+                    </a>
+
+                </div>
+
+                <!-- Enterprise -->
+                <div class="plan-card">
+
+                    <div class="plan-name">
+                        Enterprise
+                    </div>
+
+                    <div class="plan-price">
+                        ₹29
+                    </div>
+
+                    <div class="plan-unit">
+                        per verification
+                    </div>
+
+                    <div class="plan-features">
+                        1000 verifications<br>
+                        Custom doc types<br>
+                        Dedicated support
+                    </div>
+
+                    <a href="/payment?plan=enterprise"
+                       class="plan-btn">
+
+                        Buy 1000 credits — ₹29,000
+
+                    </a>
+
+                </div>
+
+            </div>
+
+        </div>
+
+        <!-- History -->
+        <div class="card">
+
+            <div class="card-title">
+                Transaction History
+            </div>
+
+            {% if verifications %}
+
+            <table class="data-table">
+
+                <thead>
+
+                    <tr>
+                        <th>Date & Time</th>
+                        <th>Document</th>
+                        <th>Type</th>
+                        <th>Result</th>
+                        <th>Charge</th>
+                    </tr>
+
+                </thead>
+
+                <tbody>
+
+                    {% for v in verifications %}
+
+                    <tr>
+
+                        <td class="muted">
+                            {{ v[7] }}
+                        </td>
+
+                        <td>
+                            {{ v[1] }}
+                        </td>
+
+                        <td>
+                            {{ v[2] }}
+                        </td>
+
+                        <td>
+
+                            <span class="badge badge-{{ v[3]|lower }}">
+
+                                {{ v[3] }}
+
+                            </span>
+
+                        </td>
+
+                        <td>
+                            ₹{{ "%.0f"|format(v[6]) }}
+                        </td>
+
+                    </tr>
+
+                    {% endfor %}
+
+                </tbody>
+
+            </table>
+
+            {% else %}
+
+            <div class="empty-state">
+                No verifications yet.
+                Upload your first document!
+            </div>
+
+            {% endif %}
+
+        </div>
+
+    </div>
+
+</body>
+</html>

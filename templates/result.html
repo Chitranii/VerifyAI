@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>VerifyAI — Result</title>
+
+    <link rel="stylesheet" href="/static/style.css">
+</head>
+<body>
+
+<div class="navbar">
+
+    <div class="logo">
+        VerifyAI
+    </div>
+
+    <div class="nav-links">
+
+        <a href="/" class="nav-link">
+            Upload
+        </a>
+
+        <a href="/billing" class="nav-link">
+            Billing
+        </a>
+
+        <a href="/admin" class="nav-link">
+            Admin
+        </a>
+
+        <div class="credits">
+            Credits: <strong>{{ credits }}</strong>
+        </div>
+
+    </div>
+
+</div>
+
+<div class="container">
+
+    <div id="resultBox" class="result-box">
+
+        <div class="result-header" id="resultHeader">
+
+            <div class="result-icon" id="resultIcon"></div>
+
+            <div>
+
+                <div class="result-title" id="resultTitle">
+                    Analysing...
+                </div>
+
+                <div class="result-subtitle" id="resultSubtitle"></div>
+
+            </div>
+
+        </div>
+
+        <div class="result-summary" id="resultSummary"></div>
+
+        <div class="checks-grid" id="checksGrid"></div>
+
+        {% if credits < 5 %}
+        <div class="low-credits-banner">
+
+            ⚠ You only have {{ credits }} credits left!
+
+            <a href="/billing" class="low-credits-link">
+                Top up now →
+            </a>
+
+        </div>
+        {% endif %}
+
+        <div class="result-footer">
+
+            <span class="charge-badge">
+                ₹40 charged
+            </span>
+
+            <div class="result-actions">
+
+                <a href="/billing" class="plan-btn result-credits-btn">
+                    💳 Buy More Credits
+                </a>
+
+                <a href="/" class="verify-another">
+                    Verify another document →
+                </a>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+
+<script>
+
+    const savedResult = localStorage.getItem('verifyResult');
+
+    if (!savedResult) {
+
+        alert('No verification result found.');
+
+        window.location.href = '/';
+    }
+
+</script>
+
+<script src="/static/result.js"></script>
+
+</body>
+</html>

@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>VerifyAI — Admin Login</title>
+    <link rel="stylesheet" href="/static/style.css">
+</head>
+<body>
+
+<div class="navbar">
+    <div class="logo">VerifyAI</div>
+    <span class="admin-portal-label">Admin Portal</span>
+</div>
+
+<div class="container login-container">
+    <div class="card">
+        <div class="login-header">
+            <div class="login-icon">🔒</div>
+            <h1 class="login-title">Admin Login</h1>
+            <p class="login-subtitle">
+                Restricted area — authorised personnel only
+            </p>
+        </div>
+
+        {% if error %}
+        <div class="login-error">
+            ⚠ {{ error }}
+        </div>
+        {% endif %}
+
+        <form method="POST">
+            <div class="login-field">
+                <label class="login-label">
+                    Username
+                </label>
+                <input type="text" name="username" placeholder="Enter username"
+                       class="login-input" required>
+            </div>
+
+            <div class="login-field-last">
+                <label class="login-label">
+                    Password
+                </label>
+                <input type="password" name="password" placeholder="Enter password"
+                       class="login-input" required>
+            </div>
+
+            <button type="submit" class="verify-btn">
+                Login to Admin Panel
+            </button>
+        </form>
+
+        <p class="login-back">
+            <a href="/" class="login-back-link">← Back to main app</a>
+        </p>
+    </div>
+</div>
+
+</body>
+</html>

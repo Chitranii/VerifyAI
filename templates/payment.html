@@ -1,0 +1,315 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>VerifyAI — Payment</title>
+    <link rel="stylesheet" href="/static/style.css">
+</head>
+<body>
+
+<div class="navbar">
+
+    <div class="logo">
+        VerifyAI
+    </div>
+
+    <div class="nav-links">
+
+        <a href="/" class="nav-link">
+            Upload
+        </a>
+
+        <a href="/billing" class="nav-link">
+            Billing
+        </a>
+
+        <a href="/admin" class="nav-link">
+            Admin
+        </a>
+
+        <div class="credits">
+            Credits: <strong>{{ credits }}</strong>
+        </div>
+
+    </div>
+
+</div>
+
+<div class="container payment-container">
+
+    <div class="card">
+
+        <!-- Order summary -->
+        <div class="order-summary">
+
+            <div class="order-summary-label">
+                ORDER SUMMARY
+            </div>
+
+            <div class="order-summary-row">
+
+                <div>
+
+                    <div class="plan-label" id="planLabel">
+                        Credit Bundle
+                    </div>
+
+                    <div class="plan-desc" id="planDesc">
+                        100 verifications
+                    </div>
+
+                </div>
+
+                <div class="plan-amount" id="planAmount">
+                    ₹4,000
+                </div>
+
+            </div>
+
+        </div>
+
+        <!-- Payment form -->
+        <div class="payment-field">
+
+            <div class="payment-label">
+                Card Number
+            </div>
+
+            <input
+                type="text"
+                placeholder="4242 4242 4242 4242"
+                maxlength="19"
+                id="cardNum"
+                title="Card Number"
+                class="payment-input card-input"
+            >
+
+        </div>
+
+        <div class="payment-grid">
+
+            <div>
+
+                <div class="payment-label">
+                    Expiry Date
+                </div>
+
+                <input
+                    type="text"
+                    placeholder="MM/YY"
+                    maxlength="5"
+                    id="expiry"
+                    title="Expiry Date"
+                    class="payment-input"
+                >
+
+            </div>
+
+            <div>
+
+                <div class="payment-label">
+                    CVV
+                </div>
+
+                <input
+                    type="password"
+                    placeholder="•••"
+                    maxlength="3"
+                    id="cvv"
+                    title="CVV"
+                    class="payment-input"
+                >
+
+            </div>
+
+        </div>
+
+        <div class="payment-field-last">
+
+            <div class="payment-label">
+                Cardholder Name
+            </div>
+
+            <input
+                type="text"
+                placeholder="Name on card"
+                id="cardName"
+                title="Cardholder Name"
+                class="payment-input"
+            >
+
+        </div>
+
+        <!-- Pay button -->
+        <button onclick="processPayment()" class="verify-btn" id="payBtn">
+
+            Pay <span id="btnAmount">₹4,000</span> Securely
+
+        </button>
+
+        <!-- Processing state -->
+        <div id="processingBox" class="processing-box">
+
+            <div class="processing-icon">
+                ⏳
+            </div>
+
+            <div class="processing-title">
+                Processing payment...
+            </div>
+
+            <div class="processing-sub">
+                Please wait, do not close this page
+            </div>
+
+        </div>
+
+        <p class="payment-secure-note">
+            Demo payment interface for prototype purposes only
+        </p>
+
+    </div>
+
+    <p class="payment-back">
+
+        <a href="/billing" class="login-back-link">
+            ← Back to billing
+        </a>
+
+    </p>
+
+</div>
+
+<script>
+
+    // Get plan details from URL
+    const params = new URLSearchParams(window.location.search);
+
+    const plan = params.get('plan') || 'bundle';
+
+    const planData = {
+
+        payg: {
+            label: 'Pay as you go',
+            desc: '10 verifications',
+            amount: '₹400'
+        },
+
+        bundle: {
+            label: 'Credit Bundle',
+            desc: '100 verifications',
+            amount: '₹4,000'
+        },
+
+        enterprise: {
+            label: 'Enterprise',
+            desc: '1000 verifications',
+            amount: '₹29,000'
+        }
+
+    };
+
+    const p = planData[plan] || planData.bundle;
+
+    document.getElementById('planLabel').textContent = p.label;
+    document.getElementById('planDesc').textContent = p.desc;
+    document.getElementById('planAmount').textContent = p.amount;
+    document.getElementById('btnAmount').textContent = p.amount;
+
+    // Format card number
+    document.getElementById('cardNum').addEventListener('input', function () {
+
+        this.value = this.value
+            .replace(/\D/g, '')
+            .replace(/(.{4})/g, '$1 ')
+            .trim();
+
+    });
+
+    // Format expiry
+    document.getElementById('expiry').addEventListener('input', function () {
+
+        this.value = this.value
+            .replace(/\D/g, '')
+            .replace(/(\d{2})(\d)/, '$1/$2');
+
+    });
+
+    function processPayment() {
+
+        const card = document.getElementById('cardNum')
+            .value
+            .replace(/\s/g, '');
+
+        const exp = document.getElementById('expiry').value;
+
+        const cvv = document.getElementById('cvv').value;
+
+        const name = document.getElementById('cardName').value;
+
+        // Validation
+        if (card.length < 16) {
+
+            alert('Please enter a valid 16-digit card number');
+            return;
+
+        }
+
+        if (exp.length < 5) {
+
+            alert('Please enter a valid expiry date');
+            return;
+
+        }
+
+        if (cvv.length < 3) {
+
+            alert('Please enter a valid CVV');
+            return;
+
+        }
+
+        if (name.trim() === '') {
+
+            alert('Please enter cardholder name');
+            return;
+
+        }
+
+        // Show processing
+        document.getElementById('payBtn').style.display = 'none';
+
+        document.getElementById('processingBox').style.display = 'block';
+
+        // Simulate processing
+        setTimeout(() => {
+
+            const form = document.createElement('form');
+
+            form.method = 'POST';
+
+            form.action = '/buy-plan';
+
+            const input = document.createElement('input');
+
+            input.type = 'hidden';
+
+            input.name = 'plan';
+
+            input.value = plan;
+
+            form.appendChild(input);
+
+            document.body.appendChild(form);
+
+            form.submit();
+
+        }, 2000);
+
+    }
+
+</script>
+
+</body>
+</html>
