@@ -3,3 +3,4 @@ gunicorn==23.0.0
 openai==2.7.2
 python-dotenv==1.1.1
 requests==2.34.0
+Pillow
