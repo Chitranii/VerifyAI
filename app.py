@@ -464,6 +464,15 @@ def verify():
     file_ext = file.filename.rsplit('.', 1)[-1].lower()
     if file_ext not in ALLOWED_EXTENSIONS:
         return jsonify({"error": "Invalid file type. Only JPG, PNG, PDF allowed."}), 400
+    
+    # Check file size — max 900KB for OCR.space free tier
+    file.seek(0, 2)  # seek to end
+    file_size = file.tell()
+    file.seek(0)     # seek back to start
+    if file_size > 900 * 1024:
+        return jsonify({
+            "error": "File too large! Please upload an image under 900KB. On phone, take a screenshot of the document instead of a direct photo."
+        }), 400
 
     safe_filename = re.sub(r'[^a-zA-Z0-9._-]', '_', file.filename)
     filepath = os.path.join(UPLOAD_FOLDER, safe_filename)
