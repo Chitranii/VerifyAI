@@ -1,9 +1,11 @@
 import os
 import re
 import sqlite3
+import requests
 from datetime import datetime
 from dotenv import load_dotenv
 from flask import Flask, render_template, request, jsonify, session, redirect, url_for
+from PIL import Image
 
 load_dotenv()
 
@@ -11,22 +13,14 @@ load_dotenv()
 ON_VERCEL = os.getenv("VERCEL") == "1"
 
 # Use /tmp on Vercel, local folder otherwise
-DB_PATH     = "/tmp/database.db" if ON_VERCEL else "database.db"
-UPLOAD_FOLDER = "/tmp/uploads" if ON_VERCEL else "uploads"
-
-# Try to load OCR — won't work on Vercel but won't crash either
-try:
-    from PIL import Image
-    import pytesseract
-    pytesseract.pytesseract.tesseract_cmd = r'C:\Program Files\Tesseract-OCR\tesseract.exe'
-    OCR_AVAILABLE = True
-except:
-    OCR_AVAILABLE = False
+DB_PATH       = "/tmp/database.db" if ON_VERCEL else "database.db"
+UPLOAD_FOLDER = "/tmp/uploads"     if ON_VERCEL else "uploads"
 
 app = Flask(__name__)
-app.secret_key   = os.getenv("SECRET_KEY", "verifyai_secret_2024")
-ADMIN_USERNAME   = os.getenv("ADMIN_USERNAME", "admin")
-ADMIN_PASSWORD   = os.getenv("ADMIN_PASSWORD", "admin123")
+app.secret_key  = os.getenv("SECRET_KEY",      "verifyai_secret_2024")
+ADMIN_USERNAME  = os.getenv("ADMIN_USERNAME",  "admin")
+ADMIN_PASSWORD  = os.getenv("ADMIN_PASSWORD",  "admin123")
+OCR_API_KEY     = os.getenv("OCR_API_KEY",     "helloworld")
 
 os.makedirs(UPLOAD_FOLDER, exist_ok=True)
 
@@ -79,6 +73,33 @@ def save_verification(filename, doc_type, result, confidence, summary):
     conn.commit()
     conn.close()
 
+# ── OCR ───────────────────────────────────────────────────────
+
+def extract_text(filepath):
+    try:
+        with open(filepath, "rb") as f:
+            response = requests.post(
+                "https://api.ocr.space/parse/image",
+                files={"file": f},
+                data={
+                    "apikey":            OCR_API_KEY,
+                    "language":          "eng",
+                    "isOverlayRequired": False,
+                    "detectOrientation": True,
+                    "scale":             True,
+                    "OCREngine":         2
+                },
+                timeout=30
+            )
+        result = response.json()
+        if result.get("OCRExitCode") == 1:
+            text = result["ParsedResults"][0]["ParsedText"]
+            return text.upper()
+        return ""
+    except Exception as e:
+        print("OCR Error:", e)
+        return ""
+
 # ── Image Quality ─────────────────────────────────────────────
 
 def check_image_quality(filepath):
@@ -94,7 +115,7 @@ def check_image_quality(filepath):
         else:
             checks.append("- File size: FAIL — File too small")
 
-        if OCR_AVAILABLE:
+        try:
             img  = Image.open(filepath)
             w, h = img.size
             if w >= 400 and h >= 300:
@@ -105,23 +126,14 @@ def check_image_quality(filepath):
             if img.mode in ['RGB', 'RGBA', 'L']:
                 checks.append("- Image format: PASS — Valid image format")
                 score += 1
-        else:
+        except:
             checks.append("- Image dimensions: PASS — File received successfully")
             checks.append("- Image format: PASS — File format accepted")
             score += 2
+
     except Exception as e:
         checks.append("- Image quality: WARN — Could not fully analyse image")
     return checks, score
-
-def extract_text(filepath):
-    if not OCR_AVAILABLE:
-        return ""
-    try:
-        img  = Image.open(filepath)
-        text = pytesseract.image_to_string(img, lang='eng')
-        return text.upper()
-    except:
-        return ""
 
 # ── Document Verifiers ────────────────────────────────────────
 
