@@ -63,6 +63,8 @@ const resultTitle   = document.getElementById('resultTitle');
 const resultSubtitle= document.getElementById('resultSubtitle');
 const resultSummary = document.getElementById('resultSummary');
 const checksGrid    = document.getElementById('checksGrid');
+const confidenceNum = document.getElementById('confidenceNum');
+const confidenceBar = document.getElementById('confidenceBar');
 
 // Verdict styling
 if (parsed.verdict === 'AUTHENTIC') {
@@ -83,10 +85,31 @@ if (parsed.verdict === 'AUTHENTIC') {
 resultSubtitle.textContent = parsed.confidence + '% confidence · ' + data.doc_type;
 resultSummary.textContent  = parsed.summary;
 
+// Animate confidence ring
+const conf = parseInt(parsed.confidence) || 0;
+const circumference = 339.29;
+requestAnimationFrame(() => {
+    setTimeout(() => {
+        confidenceBar.style.strokeDashoffset = circumference * (1 - conf / 100);
+    }, 100);
+});
+
+// Animate confidence number
+let current = 0;
+const confInterval = setInterval(() => {
+    current += Math.max(1, Math.round(conf / 40));
+    if (current >= conf) {
+        current = conf;
+        clearInterval(confInterval);
+    }
+    confidenceNum.textContent = current + '%';
+}, 30);
+
 // Render checks
-parsed.checks.forEach(check => {
+parsed.checks.forEach((check, index) => {
     const div       = document.createElement('div');
     div.className   = 'check-item ' + check.status.toLowerCase();
+    div.style.animationDelay = (index * 0.1) + 's';
     div.innerHTML   = `
         <div class="check-status">${check.status}</div>
         <div class="check-detail">
@@ -96,6 +119,11 @@ parsed.checks.forEach(check => {
     `;
     checksGrid.appendChild(div);
 });
+
+// Launch confetti for authentic results
+if (parsed.verdict === 'AUTHENTIC' && typeof launchConfetti === 'function') {
+    launchConfetti();
+}
 
 // Clear storage after displaying
 localStorage.removeItem('verifyResult');

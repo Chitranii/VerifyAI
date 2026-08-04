@@ -8,8 +8,14 @@
 </head>
 <body>
 
+<div class="bg-fx">
+    <div class="orb orb-1"></div>
+    <div class="orb orb-2"></div>
+    <div class="orb orb-3"></div>
+</div>
+
 <div class="navbar">
-    <div class="logo">VerifyAI</div>
+    <div class="logo"><span class="logo-dot"></span>VerifyAI</div>
 
     <div class="nav-links">
         <a href="/" class="nav-link active">Upload</a>
@@ -17,7 +23,7 @@
         <a href="/admin" class="nav-link">Admin</a>
 
         <div class="credits">
-            Credits: <strong>{{ credits }}</strong>
+            💠 Credits: <strong>{{ credits }}</strong>
         </div>
     </div>
 </div>
@@ -85,13 +91,15 @@
 
         </div>
 
-        <div class="file-info" id="fileInfo">
+<div class="file-info" id="fileInfo">
             <span id="fileName"></span>
 
             <span class="remove-file" onclick="removeFile()">
                 ✕ Remove
             </span>
         </div>
+
+        <div class="file-preview" id="filePreview"></div>
 
         <button
             type="submit"
@@ -106,6 +114,7 @@
 
 </div>
 
+<script src="/static/common.js"></script>
 <script src="/static/script.js"></script>
 
 </body>

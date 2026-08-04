@@ -4,6 +4,7 @@ const fileInfo   = document.getElementById('fileInfo');
 const fileName   = document.getElementById('fileName');
 const verifyBtn  = document.getElementById('verifyBtn');
 const uploadForm = document.getElementById('uploadForm');
+const filePreview = document.getElementById('filePreview');
 
 // Click upload zone
 uploadZone.addEventListener('click', () => {
@@ -15,7 +16,7 @@ fileInput.addEventListener('change', () => {
     if (fileInput.files.length > 0) {
         const file = fileInput.files[0];
         if (file.size > 900 * 1024) {
-            alert('File too large! Please upload under 900KB.\nTip: Take a screenshot of the document instead of a direct photo.');
+            showToast('File too large! Please upload under 900KB.\nTip: Take a screenshot of the document instead of a direct photo.', 'error');
             removeFile();
             return;
         }
@@ -41,7 +42,7 @@ uploadZone.addEventListener('drop', (e) => {
     const file = e.dataTransfer.files[0];
     if (file) {
         if (file.size > 900 * 1024) {
-            alert('File too large! Please upload under 900KB.');
+            showToast('File too large! Please upload under 900KB.', 'error');
             return;
         }
         fileInput.files = e.dataTransfer.files;
@@ -54,6 +55,16 @@ function showFile(file) {
     fileName.textContent    = '📄 ' + file.name;
     fileInfo.style.display  = 'flex';
     verifyBtn.disabled      = false;
+
+    // Show image preview
+    if (filePreview) {
+        const reader = new FileReader();
+        reader.onload = (e) => {
+            filePreview.innerHTML = `<img src="${e.target.result}" alt="Preview">`;
+            filePreview.style.display = 'flex';
+        };
+        reader.readAsDataURL(file);
+    }
 }
 
 // Remove file
@@ -61,6 +72,10 @@ function removeFile() {
     fileInput.value         = '';
     fileInfo.style.display  = 'none';
     verifyBtn.disabled      = true;
+    if (filePreview) {
+        filePreview.innerHTML = '';
+        filePreview.style.display = 'none';
+    }
 }
 
 // Form submit
@@ -68,12 +83,13 @@ uploadForm.addEventListener('submit', async (e) => {
     e.preventDefault();
 
     if (!fileInput.files.length) {
-        alert('Please select a file.');
+        showToast('Please select a file.', 'info');
         return;
     }
 
-    verifyBtn.textContent = 'Analysing document...';
+    verifyBtn.innerHTML = '<span class="spinner"></span> Analysing document...';
     verifyBtn.disabled    = true;
+    verifyBtn.classList.add('loading');
 
     const formData = new FormData(uploadForm);
 
@@ -95,15 +111,19 @@ uploadForm.addEventListener('submit', async (e) => {
             window.location.href = '/result';
 
         } else {
-            alert('Error: ' + result.error);
-            verifyBtn.textContent = 'Verify Document — ₹40';
-            verifyBtn.disabled    = false;
+            showToast('Error: ' + result.error, 'error');
+            resetButton();
         }
 
     } catch (error) {
         console.error(error);
-        alert('Upload failed. Please try again.');
-        verifyBtn.textContent = 'Verify Document — ₹40';
-        verifyBtn.disabled    = false;
+        showToast('Upload failed. Please try again.', 'error');
+        resetButton();
     }
 });
+
+function resetButton() {
+    verifyBtn.innerHTML = 'Verify Document — ₹40';
+    verifyBtn.disabled    = false;
+    verifyBtn.classList.remove('loading');
+}

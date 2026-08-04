@@ -9,11 +9,15 @@
 </head>
 <body>
 
+<div class="bg-fx">
+    <div class="orb orb-1"></div>
+    <div class="orb orb-2"></div>
+    <div class="orb orb-3"></div>
+</div>
+
 <div class="navbar">
 
-    <div class="logo">
-        VerifyAI
-    </div>
+    <div class="logo"><span class="logo-dot"></span>VerifyAI</div>
 
     <div class="nav-links">
 
@@ -30,7 +34,7 @@
         </a>
 
         <div class="credits">
-            Credits: <strong>{{ credits }}</strong>
+            💠 Credits: <strong>{{ credits }}</strong>
         </div>
 
     </div>
@@ -55,6 +59,19 @@
 
             </div>
 
+        </div>
+
+        <div class="confidence-wrap" id="confidenceWrap">
+            <div class="confidence-ring">
+                <svg width="130" height="130">
+                    <circle class="track" cx="65" cy="65" r="54" fill="none" stroke-width="10"></circle>
+                    <circle class="bar" id="confidenceBar" cx="65" cy="65" r="54" fill="none" stroke-width="10" stroke-dasharray="339.29" stroke-dashoffset="339.29"></circle>
+                </svg>
+                <div class="confidence-value">
+                    <div class="confidence-num" id="confidenceNum">0%</div>
+                    <div class="confidence-label">CONFIDENCE</div>
+                </div>
+            </div>
         </div>
 
         <div class="result-summary" id="resultSummary"></div>
@@ -110,6 +127,7 @@
 
 </script>
 
+<script src="/static/common.js"></script>
 <script src="/static/result.js"></script>
 
 </body>
